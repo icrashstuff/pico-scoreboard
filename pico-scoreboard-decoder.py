@@ -27,11 +27,32 @@
 # @endparblock
 #
 # @brief Simple analyzer program that decodes the signaling protocol used by the
-#        Nevco MC-2 scoreboard controller and prints the state as a series of bits
+#        Nevco 2-MC scoreboard controller and prints the state as a series of bits
 import re
 import sys
 import argparse
 import textwrap
+
+description = """
+Simple analyzer program that decodes the signaling protocol used by the
+Nevco 2-MC scoreboard controller and prints the state as a series of bits.
+
+Note: Not all Nevco 2-MC model controllers are the same, the one used
+in the creation of this program has the following controls:
+- Home score: 100's place, 10's place, 1's place, Bonus
+- Guest score: 100's place, 10's place, 1's place, Bonus
+- Timer: Reset to zero, Time in/out, Reset,
+         10's place (Limited to 0,1,2), 1's place, Up/Down
+- Horn: Press to sound
+
+Note: this script was written to parse single channel Value Change Dump (VCD) files
+emitted by sigrok-cli, it probably won't successfully parse VCD files from other programs.
+
+This program/project is licensed under the MIT license.
+Copyright (c) 2026 Ian Hangartner <icrashstuff at outlook dot com>
+See source code or LICENSE.txt for details.
+"""
+__doc__ = description
 
 def process_vcd(fd,
                 invert_samples=False,
@@ -133,13 +154,7 @@ def process_vcd(fd,
 
 def main(*args, **kwargs):
     parser = argparse.ArgumentParser(
-        description=textwrap.dedent("""
-            Simple analyzer program that decodes the signaling protocol used by the
-            Nevco MC-2 scoreboard controller and prints the state as a series of bits.
-
-            Note: this script was written to parse single channel Value Change Dump (VCD) files
-            emitted by sigrok-cli, it probably won't successfully parse VCD files from other programs.
-        """),
+        description=textwrap.dedent(__doc__),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="Example: `%(prog)s dump.vcd`\n"
                "Example: `sigrok-cli -d fx2lafw --config samplerate=\"4 Mhz\" --continuous -C D0 -O vcd | %(prog)s`\n"
