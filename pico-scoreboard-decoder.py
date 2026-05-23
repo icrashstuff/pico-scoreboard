@@ -231,9 +231,10 @@ def main(*args, **kwargs):
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(__doc__),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="Example: `%(prog)s dump.vcd`\n"
-               "Example: `sigrok-cli -d fx2lafw --config samplerate=\"4 Mhz\" --continuous -C D0 -O vcd | %(prog)s`\n"
-               "Example: `sigrok-cli -i session.sr -C D0 -O vcd | %(prog)s`\n"
+        epilog="Example: `%(prog)s sigrok_vcd dump.vcd`\n"
+               "Example: `%(prog)s sigrok_bits dump.bits`\n"
+               "Example: `sigrok-cli -d fx2lafw --config samplerate=\"4 Mhz\" --continuous -C D0 -O vcd | %(prog)s sigrok_vcd`\n"
+               "Example: `sigrok-cli -i session.sr -C D0 -O bits | %(prog)s sigrok_bits`\n"
     )
     parser.add_argument(
         "format",
