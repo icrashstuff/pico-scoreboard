@@ -2,6 +2,9 @@
 *.pvs
 *.sr
 
+# pioasm generated headers
+generated/*
+
 # Doxygen artifacts
 doxygen/*
 

@@ -1,0 +1,8 @@
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = pico-scoreboard
+PROJECT_BRIEF          = "TODO"
+OUTPUT_DIRECTORY       = doxygen
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
