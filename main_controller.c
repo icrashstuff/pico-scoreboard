@@ -106,14 +106,26 @@ int main()
     LOG("Setup done, beginning loop\n");
     while (1)
     {
-        char bitstream[] = "1110000111111111111100011111111"
-                           "11110100110011111111110000001111"
-                           "11110010111111111111101000001111"
-                           "11110110000011111111111000001111"
-                           "11110001000011111111100111111111"
-                           "11110101111111111111110111111111"
-                           "11110011111111111111101111111111"
-                           "11110111111111111111111111111111r";
+        char bitstream[] =
+#define CMD(A, B, C, D) A B C D
+            CMD("r111", "0000", "1111", "1111") // CMD: 0x0
+            CMD("1111", "1000", "1111", "1111") // CMD: 0x1
+            CMD("1111", "0100", "1100", "1111") // CMD: 0x2
+            CMD("1111", "1100", "0000", "1111") // CMD: 0x3
+            CMD("1111", "0010", "1111", "1111") // CMD: 0x4
+            CMD("1111", "1110", "0000", "1111") // CMD: 0x7
+            CMD("1111", "0110", "0000", "1111") // CMD: 0x6
+            CMD("1111", "1010", "0000", "1111") // CMD: 0x5
+            CMD("1111", "0001", "0000", "1111") // CMD: 0x8
+            CMD("1111", "1001", "1111", "1111") // CMD: 0x9
+            CMD("1111", "0101", "1111", "1111") // CMD: 0xA
+            CMD("1111", "1101", "1111", "1111") // CMD: 0xB
+            CMD("1111", "0011", "1111", "1111") // CMD: 0xC
+            CMD("1111", "1011", "1111", "1111") // CMD: 0xD
+            CMD("1111", "0111", "1111", "1111") // CMD: 0xE
+            CMD("1111", "1111", "1111", "1111") // CMD: 0xF
+            ;
+#undef CMD
 
         uint32_t t = (time_us_32() / (1000 * 100)) % 1800;
         uint32_t ts = t % 60;
@@ -126,31 +138,31 @@ int main()
         uint32_t tm1 = tm / 10;
 
         /* timer_digit_0: offset=0x57 size=4 */
-        bitstream[0x57] = (ts0 & 1) ? '1' : '0';
-        bitstream[0x58] = (ts0 & 2) ? '1' : '0';
-        bitstream[0x59] = (ts0 & 4) ? '1' : '0';
-        bitstream[0x5A] = (ts0 & 8) ? '1' : '0';
+        bitstream[0x57 + 1] = (ts0 & 1) ? '1' : '0';
+        bitstream[0x58 + 1] = (ts0 & 2) ? '1' : '0';
+        bitstream[0x59 + 1] = (ts0 & 4) ? '1' : '0';
+        bitstream[0x5A + 1] = (ts0 & 8) ? '1' : '0';
 
         /* timer_digit_1: offset=0x67 size=3
          * While not used by the controller this digit does have the logic to display the numbers 6 and 7
          * This digit does not have the logic to display the number 8, but you can fake it by switching between two values very rapidly
          * This digit does not have the logic to display the number 9, but you can fake it by switching between two values very rapidly
          */
-        bitstream[0x67] = (ts1 & 1) ? '1' : '0';
-        bitstream[0x68] = (ts1 & 2) ? '1' : '0';
-        bitstream[0x69] = (ts1 & 4) ? '1' : '0';
+        bitstream[0x67 + 1] = (ts1 & 1) ? '1' : '0';
+        bitstream[0x68 + 1] = (ts1 & 2) ? '1' : '0';
+        bitstream[0x69 + 1] = (ts1 & 4) ? '1' : '0';
 
         /* timer_digit_2: offset=0x77 size=4 */
-        bitstream[0x77] = (tm0 & 1) ? '1' : '0';
-        bitstream[0x78] = (tm0 & 2) ? '1' : '0';
-        bitstream[0x79] = (tm0 & 4) ? '1' : '0';
-        bitstream[0x7A] = (tm0 & 8) ? '1' : '0';
+        bitstream[0x77 + 1] = (tm0 & 1) ? '1' : '0';
+        bitstream[0x78 + 1] = (tm0 & 2) ? '1' : '0';
+        bitstream[0x79 + 1] = (tm0 & 4) ? '1' : '0';
+        bitstream[0x7A + 1] = (tm0 & 8) ? '1' : '0';
 
         /* timer_digit_3: offset=0x87 size=2
          * This digit does not have the logic to display the number 3, attempt to do so will display both 1 and 2 at the same time
          */
-        bitstream[0x87] = (tm1 & 1) ? '1' : '0';
-        bitstream[0x88] = (tm1 & 2) ? '1' : '0';
+        bitstream[0x87 + 1] = (tm1 & 1) ? '1' : '0';
+        bitstream[0x88 + 1] = (tm1 & 2) ? '1' : '0';
 
         uint32_t word = 0;
         for (size_t i = 0, p = 0; i < sizeof(bitstream); i++)
