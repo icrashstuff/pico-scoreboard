@@ -57,7 +57,7 @@ Bitstream seems to be organized as a series of 16 bit wide "commands". Commands 
 
 |  Bits |            Description             |
 |-------|------------------------------------|
-| 0-3   | Unknown (Always '1111' or 'r1111') |
+| 0-3   | Unknown (Always '1111' or 'r111') |
 | 4-7   | Write Address                      |
 | 8-11  | Data                               |
 | 12-15 | Unknown (Always '1111')            |
