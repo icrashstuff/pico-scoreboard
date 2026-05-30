@@ -107,12 +107,12 @@ class decoder_t:
         high_period = self.last_fall - self.last_rise
 
         if (high_period <= self.time_high_max_for_bit0):
-            self.buf.append(0)
+            self.buf.append("0")
         elif (high_period <= self.time_high_max_for_bit1):
-            self.buf.append(1)
+            self.buf.append("1")
         else:
-            # Convert buffer to string of 0's and 1's
-            s = "".join(["1" if i else "0" for i in self.buf])
+            # Convert buffer to code string
+            s = "".join(self.buf)
             # Convert s to array of 8 character long string
             s = [s[i:i+8] for i in range(0, len(s), 8)]
             # Join the array 's' with space a the separator
@@ -128,12 +128,12 @@ class decoder_t:
 
             self.last_joined_buf = joined_buf
 
-            self.buf = []
+            self.buf = [ "r" ]
 
             if (high_period - self.time_high_for_restart <= self.time_high_max_for_bit0):
-                self.buf.append(0)
+                self.buf.append("0")
             elif (high_period - self.time_high_for_restart <= self.time_high_max_for_bit1):
-                self.buf.append(1)
+                self.buf.append("1")
 
 
 def process_sigrok_vcd(fd: typing.IO, **kwargs):
