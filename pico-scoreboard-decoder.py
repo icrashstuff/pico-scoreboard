@@ -160,7 +160,7 @@ def process_sigrok_vcd(fd: typing.IO, **kwargs):
 
         if (i.startswith("$var wire")):
             if (found_wire):
-                raise Exception(f"Only signal channel VCD files are accepted!")
+                raise Exception("Only single channel VCD files are accepted!")
             found_wire = True
 
     if (not found_timescale):
@@ -198,7 +198,7 @@ def process_sigrok_bits(fd: typing.IO, **kwargs):
             raise Exception(f"Unsuitable unit {m.groupdict()["unit"]}")
         if (int(m.groupdict()["num_enabled_channels"]) != 1):
             raise Exception(
-                f"Only signal channel sigrok bit files are accepted!")
+                "Only single channel sigrok bit files are accepted!")
 
         unit_multiplier = units[m.groupdict()["unit"]] * \
             int(m.groupdict()["mag"]) * 4
