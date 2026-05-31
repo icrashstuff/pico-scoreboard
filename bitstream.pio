@@ -29,18 +29,22 @@
 
 .pio_version 0
 
-.program bitstream_tx
+.program scoreboard_bitstream_tx
 .wrap_target
-    out pins, 1      ; Shift out bit
+    set pins, 1 ; Start code-point
+    out pins, 1 ; Shift out code-point value
+    nop         ; Hold value
+    out pins, 1 ; End code-point (This will be 0 for a normal code, and 1 for restart)
 .wrap
 
 % c-sdk {
 #include "hardware/clocks.h"
-static inline void bitstream_tx_program_init(PIO pio, uint sm, uint offset, uint pin, uint baudrate)
+static inline void scoreboard_bitstream_tx_program_init(PIO pio, uint sm, uint offset, uint pin, uint baudrate)
 {
     pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
     pio_gpio_init(pio, pin);
-    pio_sm_config c = bitstream_tx_program_get_default_config(offset);
+    pio_sm_config c = scoreboard_bitstream_tx_program_get_default_config(offset);
+    sm_config_set_set_pins(&c, pin, 1);
     sm_config_set_out_pins(&c, pin, 1);
 
     /* Shift OSR to the left, autopull at 32 bits */

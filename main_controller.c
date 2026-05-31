@@ -50,6 +50,11 @@
  */
 #define GPIO_SIGNAL 22
 
+/**
+ * Invert scoreboard controller signal
+ */
+#define SIGNAL_INVERTED 1
+
 #define LOG(fmt, ...) printf("Core %u: " fmt, get_core_num(), ##__VA_ARGS__)
 
 [[noreturn]] void die(void)
@@ -70,8 +75,6 @@ int main()
     pwm_set_gpio_level(PICO_DEFAULT_LED_PIN, 3);
     pwm_set_enabled(pwm_gpio_to_slice_num(PICO_DEFAULT_LED_PIN), true);
 #endif
-
-    gpio_set_drive_strength(GPIO_SIGNAL, GPIO_DRIVE_STRENGTH_12MA);
 
     stdio_init_all();
     while (!stdio_usb_connected() && time_us_64() < 5000000ull)
@@ -96,12 +99,16 @@ int main()
     uint sm;
     uint offset;
 
-    pio_claim_free_sm_and_add_program(&bitstream_tx_program, &pio, &sm, &offset);
-    bitstream_tx_program_init(pio, sm, offset, GPIO_SIGNAL, 1000000);
+    pio_claim_free_sm_and_add_program(&scoreboard_bitstream_tx_program, &pio, &sm, &offset);
+    scoreboard_bitstream_tx_program_init(pio, sm, offset, GPIO_SIGNAL, 1000000);
 
-    const uint8_t nibble_restart = 0xF;
-    const uint8_t nibble_bit1 = 0xE; /**< hex(0b1110) */
-    const uint8_t nibble_bit0 = 0x8; /**< hex(0b1000) */
+    gpio_set_outover(GPIO_SIGNAL, SIGNAL_INVERTED ? GPIO_OVERRIDE_INVERT : GPIO_OVERRIDE_NORMAL);
+    gpio_set_drive_strength(GPIO_SIGNAL, GPIO_DRIVE_STRENGTH_4MA);
+    gpio_set_slew_rate(GPIO_SIGNAL, GPIO_SLEW_RATE_SLOW);
+
+    const uint8_t crumb_restart = 0x3;
+    const uint8_t crumb_bit1 = 0x2;
+    const uint8_t crumb_bit0 = 0x0;
 
     LOG("Setup done, beginning loop\n");
     while (1)
@@ -170,24 +177,23 @@ int main()
             switch (bitstream[i])
             {
             case 'r':
-                word = (word << 4) | nibble_restart;
+                word = (word << 2) | crumb_restart;
                 p++;
                 break;
             case '0':
-                word = (word << 4) | nibble_bit0;
+                word = (word << 2) | crumb_bit0;
                 p++;
                 break;
             case '1':
-                word = (word << 4) | nibble_bit1;
+                word = (word << 2) | crumb_bit1;
                 p++;
                 break;
             default:
                 break;
             }
-            if (p == 8)
+            if (p == 16)
             {
-                /* Push inverted word because the line driver will invert it back to normal */
-                pio_sm_put_blocking(pio, sm, ~word);
+                pio_sm_put_blocking(pio, sm, word);
                 p = 0;
             }
         }
