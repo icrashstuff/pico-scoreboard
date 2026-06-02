@@ -68,13 +68,16 @@ endfunction()
 # BEGIN: Controller
 add_executable(pico-scoreboard-controller
     main_controller.c
+    scoreboard.c
 )
 
 target_link_libraries(pico-scoreboard-controller PRIVATE
+    pico_sync
     pico_stdlib
     pico_malloc
     hardware_pio
     hardware_pwm
+    hardware_dma
     hardware_watchdog
 )
 pico_generate_pio_header(pico-scoreboard-controller

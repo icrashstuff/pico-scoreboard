@@ -32,11 +32,10 @@
 
 #include "pico/stdlib.h"
 
-#include "hardware/pio.h"
 #include "hardware/pwm.h"
 #include "hardware/watchdog.h"
 
-#include "generated/bitstream.pio.h"
+#include "scoreboard.h"
 
 /**
  * @brief GPIO pin to output scoreboard controller signal on
@@ -56,6 +55,8 @@
 #define SIGNAL_INVERTED 1
 
 #define LOG(fmt, ...) printf("Core %u: " fmt, get_core_num(), ##__VA_ARGS__)
+
+#define arraysize(X) (sizeof(X) / sizeof(X[0]))
 
 [[noreturn]] void die(void)
 {
@@ -95,20 +96,7 @@ int main()
     putc('\n', stdout);
     putc('\n', stdout);
 
-    PIO pio;
-    uint sm;
-    uint offset;
-
-    pio_claim_free_sm_and_add_program(&scoreboard_bitstream_tx_program, &pio, &sm, &offset);
-    scoreboard_bitstream_tx_program_init(pio, sm, offset, GPIO_SIGNAL, 1000000);
-
-    gpio_set_outover(GPIO_SIGNAL, SIGNAL_INVERTED ? GPIO_OVERRIDE_INVERT : GPIO_OVERRIDE_NORMAL);
-    gpio_set_drive_strength(GPIO_SIGNAL, GPIO_DRIVE_STRENGTH_4MA);
-    gpio_set_slew_rate(GPIO_SIGNAL, GPIO_SLEW_RATE_SLOW);
-
-    const uint8_t crumb_restart = 0x3;
-    const uint8_t crumb_bit1 = 0x2;
-    const uint8_t crumb_bit0 = 0x0;
+    scoreboard_init(NUM_DMA_IRQS - 1, GPIO_SIGNAL, SIGNAL_INVERTED, 16, 4);
 
     LOG("Setup done, beginning loop\n");
     while (1)
@@ -177,26 +165,27 @@ int main()
             switch (bitstream[i])
             {
             case 'r':
-                word = (word << 2) | crumb_restart;
+                word = (word << 2) | scoreboard_crumb_restart;
                 p++;
                 break;
             case '0':
-                word = (word << 2) | crumb_bit0;
+                word = (word << 2) | scoreboard_crumb_bit0;
                 p++;
                 break;
             case '1':
-                word = (word << 2) | crumb_bit1;
+                word = (word << 2) | scoreboard_crumb_bit1;
                 p++;
                 break;
             default:
                 break;
             }
-            if (p == 16)
+            if (p == 16 && i / 16 < scoreboard_cmd_buf_element_count)
             {
-                pio_sm_put_blocking(pio, sm, word);
+                scoreboard_cmd_buf_writing[i / 16] = word;
                 p = 0;
             }
         }
+        scoreboard_swap();
         pwm_set_gpio_level(PICO_DEFAULT_LED_PIN, ((time_us_32() >> 18) & 1) ? 3 : 0);
     }
 }
