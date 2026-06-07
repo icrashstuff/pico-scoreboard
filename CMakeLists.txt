@@ -45,6 +45,7 @@ function(common_options target)
         PICO_DEBUG_MALLOC=1
         USBD_MANUFACTURER="Ian Hangartner"
         USBD_PRODUCT="${target}"
+        USBD_DESC_STR_MAX=64
     )
     target_compile_definitions(${target} PRIVATE
         CMAKE_PICO_BOARD="${PICO_BOARD}"
