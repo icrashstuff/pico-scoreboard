@@ -16,7 +16,9 @@ Nevco 2-MC scoreboard controller with the following controls
 - Timer:
   - Time up/Time down
   - Reset to zero
-  - 10's place (Limited to 'OFF','1','2')
+  - 1000's place (Limited to 'OFF','1','2')
+  - 100's place
+  - 10's place (Limited to 0-7)
   - 1's place
   - Reset
   - Time in/out
@@ -45,7 +47,8 @@ A bitstream is transmitted as a signal with the following states:
 ### Physical
 
 - Voltage at line driver: 5v - 5.5v
-- Current draw: Unsure, but probably 10-20 mA as the 2-MC uses chips from the original 7400 TTL series so the scoreboard likely does as well
+- Current draw (excluding pull down): Unsure, but probably 10-20 mA as the 2-MC uses chips from the original 7400 TTL series so the scoreboard likely does as well
+- Signal line is pulled to ground through a 100 ohm resistor
 
 ---
 
@@ -64,7 +67,11 @@ Bitstream seems to be organized as a series of 16 bit wide "commands". Commands 
 
 ## Addresses
 
-Addresses seem to correspond with the divisions in the MUX input section of the 2-MC circuit board
+Addresses seem to correspond with the divisions in the MUX input section of the 2-MC circuit board.
+
+All multi-bit values are ordered least significant bit first.
+
+For 4 bit digit values: A value of 0xF will display a blank digit.
 
 |  Address   |     Bit 0 Description     |     Bit 1 Description     |     Bit 2 Description     |     Bit 3 Description     |
 |------------|---------------------------|---------------------------|---------------------------|---------------------------|
@@ -85,9 +92,9 @@ Addresses seem to correspond with the divisions in the MUX input section of the 
 | 0111 (0xE) | Unknown (Always 1)        | Unknown (Always 1)        | Unknown (Always 1)        | Unknown (Always 1)        |
 | 1111 (0xF) | Unknown (Always 1)        | Unknown (Always 1)        | Unknown (Always 1)        | Unknown (Always 1)        |
 
-Some addresses have side effects when written to **(TABLE INCOMPLETE)**
+Some addresses have side effects when written to
 
 |  Address   |         Side effects         |
 |------------|------------------------------|
-| 0110 (0x6) | Illuminates home Lamp, Guests Lamp |
-| 1010 (0x7) | Illuminates timer separator lamps, Timer digits 1 & 2 top right corner lamp, middle right joint lamp, and bottom right corner lamps |
+| 0110 (0x6) | Illuminates Home Lamp, Guest Lamp |
+| 1010 (0x7) | Illuminates timer separator lamps, Timer digits 0 & 1 top right corner lamp, middle right joint lamp, and bottom right corner lamps |

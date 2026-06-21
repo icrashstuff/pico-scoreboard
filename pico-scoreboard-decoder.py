@@ -42,8 +42,8 @@ Note: Not all Nevco 2-MC model controllers are the same, the one used
 in the creation of this program has the following controls:
 - Home score: 100's place, 10's place, 1's place, Bonus
 - Guest score: 100's place, 10's place, 1's place, Bonus
-- Timer: Reset to zero, Time in/out, Reset,
-         10's place (Limited to 0,1,2), 1's place, Up/Down
+- Timer: Reset to zero, Time in/out, Reset, 1000's place (Limited to 'OFF','1','2'),
+         100's place, 10's place (Limited to 0-7), 1's place Up/Down
 - Horn: Press to sound
 
 Note: Value Change Dump (VCD) support is limited to single channel dumps emitted
