@@ -77,12 +77,12 @@ static uint offset;
 
 static void reset_command_buf(uint32_t* cmd_buf, uint32_t num_elements)
 {
-    /* Set command buffers to all 1s */
-    memset(cmd_buf, 0xAA, num_elements * sizeof(*cmd_buf));
+    uint8_t c = scoreboard_crumb_restart;
+    c = (c << 2) | scoreboard_crumb_restart;
+    c = (c << 2) | scoreboard_crumb_restart;
+    c = (c << 2) | scoreboard_crumb_restart;
 
-    /* Add restart code-points */
-    for (size_t i = 0; i < num_elements; i += 16)
-        cmd_buf[i] = (cmd_buf[i] & 0x3FFFFFFF) | (scoreboard_crumb_restart << 30);
+    memset(cmd_buf, c, num_elements * sizeof(*cmd_buf));
 }
 
 void scoreboard_init(uint32_t dma_irq_num, uint32_t gpio, bool invert, uint32_t cmd_buf_element_count, uint32_t cmd_buf_repeats)
